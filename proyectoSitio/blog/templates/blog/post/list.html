@@ -2,16 +2,20 @@
 {% block title %}My blog{% endblock  %}
 {% block content %}
     <h1>My blog</h1>
+    {% if tag %}
+        <h2>Post tagget with {{tag.name}}</h2>
+    {% endif %}
     {% for post in posts  %}
         <h2>
             <a href="{{ post.get_absolute_url }}">
                 {{ post.title}}
             </a>
         </h2>
+        <p class="tag">tags: {{ post.tag.all|join:", "}}</p>
         <p class="data">
             published {{ post.publish }} by {{ post.author }}
         </p>
         {{ post.body|truncatechars:150|linebreaks }}
     {% endfor %}
-    {% include "pagination.html" with page=page_obj %}
+    {% include "pagination.html" with page=posts %}
 {% endblock  %}
