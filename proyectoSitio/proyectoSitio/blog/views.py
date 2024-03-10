@@ -5,10 +5,9 @@ from django.core.paginator import Paginator, EmptyPage
 from django.views.generic import ListView
 from .forms import EmailPostFrom, CommentForm
 from django.core.mail import send_mail
-from taggit.models import Tag
-from django.db.models import Count
 
 from django.views.decorators.http import require_POST
+from taggit.models import Tag
 
 
 # create views with class
@@ -17,7 +16,6 @@ from django.views.decorators.http import require_POST
 #     context_object_name = 'posts'
 #     paginate_by = 3
 #     template_name = 'blog/post/list.html'
-
 
 # Create your views here.
 def post_list(request, tag_slug=None):
@@ -37,9 +35,6 @@ def post_list(request, tag_slug=None):
                   {'posts': posts,
                    'tag': tag})
     
-
-
-
 def post_detail(request,year,month,day,post):
     try:
         post = Post.published.get(slug=post,
@@ -48,19 +43,14 @@ def post_detail(request,year,month,day,post):
                                   publish__day=day)
         comments = post.comments.filter(active=True)
         form = CommentForm()
-        post_tags_ids = post.tags.values_list('id', flat=True)
-        similar_posts = Post.published.filter(tags__in=post_tags_ids)\
-                                        .exclude(id=post.id)
-        similar_posts = similar_posts.annotate(same_tags=Count('tags'))\
-                                        .order_by('-same_tags','-publish')
+
     except Post.DoesNotExist:
         raise Http404('no post found')
     return render(request,
                   'blog/post/detail.html',
                    {'post': post,
                     'comments' : comments,
-                    'form': form,
-                    'similar_posts': similar_posts})
+                    'form': form})
     
 def post_share(request, post_id):
     post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
